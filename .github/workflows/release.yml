@@ -4,6 +4,9 @@ on:
   push:
     tags: ['v*', 'beta*']
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: windows-latest
