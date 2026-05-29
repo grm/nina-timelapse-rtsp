@@ -25,3 +25,16 @@ This changelog is used by the `/release` skill to determine the appropriate vers
 - `Services/` — Frame capture, video encoding, session management
 - `Targets/` — Output delivery (Discord, file)
 - `.github/workflows/` — CI build + release automation
+
+## NINA Plugin Development Reference
+
+- **Official plugin template**: https://github.com/isbeorn/nina.plugin.template
+  - Single NuGet dependency: `NINA.Plugin` (pulls NINA.Core, NINA.Sequencer, NINA.WPF.Base, etc.)
+  - XAML sequencer views use assembly `NINA.Sequencer` (not `NINA.WPF.Base`):
+    `xmlns:nina="clr-namespace:NINA.View.Sequencer;assembly=NINA.Sequencer"`
+  - ResourceDictionary code-behind must have `[Export(typeof(ResourceDictionary))]` for MEF discovery
+  - DataTemplate matching: `DataType="{x:Type local:MyInstruction}"` for sequencer items
+  - Sequence items require `[Export(typeof(ISequenceItem))]` + `ExportMetadata` (Name, Description, Icon, Category)
+  - Constructor injection via `[ImportingConstructor]`
+  - Serialization: `[JsonObject(MemberSerialization.OptIn)]` + `[JsonProperty]` on persisted fields
+  - Never rename exported type namespaces after publishing (sequences serialize the fully qualified type name)
