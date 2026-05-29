@@ -1,0 +1,98 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:NINA.Plugin.TimelapseRTSP.Options">
+
+    <DataTemplate x:Key="TimelapseRTSP_Options" DataType="{x:Type local:TimelapseRTSPOptions}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical" Margin="10">
+                <!-- RTSP Configuration -->
+                <GroupBox Header="RTSP Configuration" Margin="0,0,0,10">
+                    <StackPanel Margin="5">
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="RTSP URL:" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding RtspUrl, UpdateSourceTrigger=PropertyChanged}" Width="400"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Username:" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding RtspUsername, UpdateSourceTrigger=PropertyChanged}" Width="200"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Password:" Width="120" VerticalAlignment="Center"/>
+                            <PasswordBox Width="200"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Timelapse Settings -->
+                <GroupBox Header="Timelapse Settings" Margin="0,0,0,10">
+                    <StackPanel Margin="5">
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Capture Interval (s):" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding CaptureIntervalSeconds, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                            <TextBlock Text="Seconds between each frame capture" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="Gray"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Target FPS:" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding TargetFps, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                            <TextBlock Text="Frames per second in output video" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="Gray"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Video Codec:" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding VideoCodec, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Video Quality (CRF):" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding VideoQuality, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                            <TextBlock Text="Lower = better quality (18-28 typical)" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="Gray"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Max File Size (MB):" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding MaxFileSizeMB, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                            <TextBlock Text="Video will be re-encoded if it exceeds this (0 = no limit)" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="Gray"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Max Encode Retries:" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding MaxEncodeRetries, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                            <TextBlock Text="Re-encode attempts to fit within file size limit" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="Gray"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Frame Resolution:" Width="120" VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{x:Static local:TimelapseRTSPOptions.AvailableResolutions}"
+                                      SelectedItem="{Binding FrameResolution}" Width="150"/>
+                            <TextBlock Text="Downscale frames on capture" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="Gray"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- FFmpeg -->
+                <GroupBox Header="FFmpeg" Margin="0,0,0,10">
+                    <StackPanel Margin="5">
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="FFmpeg Path:" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding FfmpegPath, UpdateSourceTrigger=PropertyChanged}" Width="400"/>
+                        </StackPanel>
+                        <TextBlock Text="Path to ffmpeg.exe (leave as 'ffmpeg' if in PATH)" Foreground="Gray" Margin="120,0,0,5"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Output Targets -->
+                <GroupBox Header="Output Targets" Margin="0,0,0,10">
+                    <StackPanel Margin="5">
+                        <CheckBox Content="Save to file" IsChecked="{Binding SaveToFile}" Margin="0,5"/>
+                        <StackPanel Orientation="Horizontal" Margin="20,5,0,5">
+                            <TextBlock Text="Output Directory:" Width="100" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding OutputDirectory, UpdateSourceTrigger=PropertyChanged}" Width="400"/>
+                        </StackPanel>
+
+                        <CheckBox Content="Send to Discord" IsChecked="{Binding SendToDiscord}" Margin="0,10,0,5"/>
+                        <StackPanel Orientation="Horizontal" Margin="20,5,0,5">
+                            <TextBlock Text="Webhook URL:" Width="100" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding DiscordWebhookUrl, UpdateSourceTrigger=PropertyChanged}" Width="400"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+</ResourceDictionary>
