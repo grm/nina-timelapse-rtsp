@@ -11,11 +11,11 @@ Creates a pre-release test package on GitHub.
 
 1. Read the current version from `NINA.Plugin.TimelapseRTSP/Properties/AssemblyInfo.cs`.
 2. Check existing beta tags with `git tag -l "beta*"` to determine the next beta number.
-   - Format: `beta-X.Y.Z-N` where X.Y.Z is the current version and N is an incrementing number (1, 2, 3...)
+   - Format: `beta-X.Y.Z.W-N` where X.Y.Z.W is the 4-part version from AssemblyInfo and N is an incrementing number (1, 2, 3...)
    - If no beta exists for this version, start at 1.
-3. Create the tag `beta-X.Y.Z-N` on the current HEAD (no version bump, no changelog change).
+3. Create the tag `beta-X.Y.Z.W-N` on the current HEAD (no version bump, no changelog change).
 4. Push the tag to origin. This triggers the `release.yml` workflow which builds, zips, and creates a GitHub **pre-release** automatically.
-5. Report the pre-release URL: `https://github.com/grm/nina-timelapse-rtsp/releases/tag/beta-X.Y.Z-N`
+5. Report the pre-release URL: `https://github.com/grm/nina-timelapse-rtsp/releases/tag/beta-X.Y.Z.W-N`
 
 ## Notes
 
