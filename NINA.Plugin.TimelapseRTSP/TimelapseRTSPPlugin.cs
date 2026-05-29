@@ -1,4 +1,5 @@
 using NINA.Plugin;
+using NINA.Plugin.Interfaces;
 using NINA.Profile;
 using NINA.Profile.Interfaces;
 using NINA.Plugin.TimelapseRTSP.Options;
