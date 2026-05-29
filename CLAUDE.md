@@ -1,5 +1,9 @@
 # NINA Timelapse RTSP Plugin
 
+## Git Commits
+
+- Do NOT add `Co-Authored-By` lines — all commits are authored by the user
+
 ## Changelog Policy
 
 **Every time you make a code change (feature, fix, refactor, removal), you MUST update `CHANGELOG.md`:**

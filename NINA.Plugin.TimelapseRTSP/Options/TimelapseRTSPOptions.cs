@@ -1,5 +1,5 @@
 using NINA.Core.Utility;
-using NINA.Plugin.Interfaces;
+using NINA.Profile.Interfaces;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
