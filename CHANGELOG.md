@@ -21,3 +21,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - FFmpeg path configuration
 - In-app documentation for NINA plugin manager
 - GitHub Actions CI build and release workflows
+- Pre-release beta packaging via `/beta` skill

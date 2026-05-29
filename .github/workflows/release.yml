@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    tags: ['v*']
+    tags: ['v*', 'beta*']
 
 jobs:
   release:
@@ -30,3 +30,4 @@ jobs:
         with:
           files: TimelapseRTSP-${{ github.ref_name }}.zip
           generate_release_notes: true
+          prerelease: ${{ startsWith(github.ref_name, 'beta') }}
