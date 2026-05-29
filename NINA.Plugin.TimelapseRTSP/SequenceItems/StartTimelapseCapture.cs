@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace NINA.Plugin.TimelapseRTSP.SequenceItems {
 
     [ExportMetadata("Name", "Start RTSP Timelapse")]
-    [ExportMetadata("Description", "Starts capturing frames from the configured RTSP stream for timelapse creation")]
+    [ExportMetadata("Description", "Begins grabbing frames from your RTSP camera at the configured interval. Place at the start of your sequence. Configure the stream URL and settings in the plugin options.")]
     [ExportMetadata("Icon", "CameraSVG")]
     [ExportMetadata("Category", "Timelapse RTSP")]
     [Export(typeof(ISequenceItem))]

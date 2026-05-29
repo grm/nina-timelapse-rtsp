@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace NINA.Plugin.TimelapseRTSP.SequenceItems {
 
     [ExportMetadata("Name", "Stop RTSP Timelapse")]
-    [ExportMetadata("Description", "Stops RTSP frame capture, encodes the timelapse video, sends to targets, and cleans up")]
+    [ExportMetadata("Description", "Stops frame capture, encodes all frames into an MP4 timelapse video, sends it to your configured targets (file/Discord), then cleans up temporary files. Place at the end of your sequence.")]
     [ExportMetadata("Icon", "StopSVG")]
     [ExportMetadata("Category", "Timelapse RTSP")]
     [Export(typeof(ISequenceItem))]
