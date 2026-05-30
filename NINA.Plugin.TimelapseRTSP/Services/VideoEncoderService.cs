@@ -21,7 +21,7 @@ namespace NINA.Plugin.TimelapseRTSP.Services {
 
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var outputPath = Path.Combine(outputDir, $"timelapse_{timestamp}.mp4");
-            var inputPattern = Path.Combine(framesDirectory, "frame_%06d.jpg");
+            var inputPattern = Path.Combine(framesDirectory, "frame_%06d.bmp");
 
             // First pass: encode with CRF
             await RunFfmpeg(options, BuildCrfArguments(options, inputPattern, outputPath), token);
