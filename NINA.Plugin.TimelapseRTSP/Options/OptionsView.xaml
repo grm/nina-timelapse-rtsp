@@ -4,8 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:NINA.Plugin.TimelapseRTSP.Options">
 
-    <DataTemplate x:Key="TimelapseRTSP_Options" DataType="{x:Type local:TimelapseRTSPOptions}">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <DataTemplate x:Key="TimelapseRTSP_Options">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" DataContext="{Binding Options}">
             <StackPanel Orientation="Vertical" Margin="10">
                 <!-- RTSP Configuration -->
                 <GroupBox Header="RTSP Configuration" Margin="0,0,0,10">

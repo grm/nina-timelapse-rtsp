@@ -12,6 +12,8 @@ namespace NINA.Plugin.TimelapseRTSP {
     public class TimelapseRTSPPlugin : PluginBase {
         private readonly IPluginOptionsAccessor optionsAccessor;
 
+        public TimelapseRTSPOptions Options => TimelapseRTSPOptions.Instance;
+
         [ImportingConstructor]
         public TimelapseRTSPPlugin(IProfileService profileService) {
             if (TimelapseRTSPOptions.Instance == null) {
