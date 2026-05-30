@@ -73,7 +73,7 @@ namespace NINA.Plugin.TimelapseRTSP.Services {
 
             var startInfo = new ProcessStartInfo {
                 FileName = options.FfmpegPath,
-                Arguments = $"-y -rtsp_transport tcp -i \"{rtspUrl}\" -frames:v 1 {filterArgs}-q:v 2 \"{outputPath}\"",
+                Arguments = $"-y -rtsp_transport tcp -rtsp_flags prefer_tcp -stimeout 10000000 -i \"{rtspUrl}\" -frames:v 1 {filterArgs}-q:v 2 \"{outputPath}\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -119,8 +119,12 @@ namespace NINA.Plugin.TimelapseRTSP.Services {
             var url = options.RtspUrl;
             if (!string.IsNullOrEmpty(options.RtspUsername)) {
                 var uri = new Uri(url);
-                var credentials = $"{options.RtspUsername}:{options.RtspPassword}";
-                url = $"{uri.Scheme}://{credentials}@{uri.Host}:{uri.Port}{uri.PathAndQuery}";
+                if (string.IsNullOrEmpty(uri.UserInfo)) {
+                    var user = Uri.EscapeDataString(options.RtspUsername);
+                    var pass = Uri.EscapeDataString(options.RtspPassword ?? "");
+                    var port = uri.Port > 0 ? uri.Port : 554;
+                    url = $"{uri.Scheme}://{user}:{pass}@{uri.Host}:{port}{uri.PathAndQuery}";
+                }
             }
             return url;
         }
