@@ -20,7 +20,7 @@
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <TextBlock Text="Password:" Width="120" VerticalAlignment="Center"/>
-                            <PasswordBox Width="200"/>
+                            <TextBox Text="{Binding RtspPassword, UpdateSourceTrigger=PropertyChanged}" Width="200"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
