@@ -17,6 +17,8 @@
   <ItemGroup>
     <PackageReference Include="NINA.Plugin" Version="3.2.0.9001" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="LibVLCSharp" Version="3.9.1" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
   </ItemGroup>
 
   <PropertyGroup>

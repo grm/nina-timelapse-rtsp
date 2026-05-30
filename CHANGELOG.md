@@ -7,10 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Replace ffmpeg-based frame capture with LibVLCSharp for native RTSP Digest auth support
+
 ### Fixed
 - RTSP password not being saved in plugin settings
-- URL-encode credentials to handle special characters in username/password
-- Avoid duplicating credentials when the RTSP URL already contains them
+- RTSP authentication failing on cameras requiring Digest auth (401 Unauthorized)
 
 ### Added
 - Start RTSP Timelapse sequence instruction for the Advanced Sequencer

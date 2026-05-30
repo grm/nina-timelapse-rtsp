@@ -1,7 +1,7 @@
+using LibVLCSharp.Shared;
 using NINA.Core.Utility;
 using NINA.Plugin.TimelapseRTSP.Options;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +13,8 @@ namespace NINA.Plugin.TimelapseRTSP.Services {
         private int frameCount;
         private CancellationTokenSource captureCts;
         private Task captureTask;
+        private LibVLC libVLC;
+        private MediaPlayer mediaPlayer;
 
         public string TempDirectory => tempDirectory;
         public int FrameCount => frameCount;
@@ -25,6 +27,8 @@ namespace NINA.Plugin.TimelapseRTSP.Services {
 
             frameCount = 0;
             captureCts = CancellationTokenSource.CreateLinkedTokenSource(externalToken);
+
+            InitializeVlc(options);
 
             captureTask = Task.Run(() => CaptureLoop(captureCts.Token), captureCts.Token);
             Logger.Info($"TimelapseRTSP: Started frame capture to {tempDirectory}");
@@ -42,7 +46,47 @@ namespace NINA.Plugin.TimelapseRTSP.Services {
                 }
             }
 
+            DisposeVlc();
             Logger.Info($"TimelapseRTSP: Stopped capture. {frameCount} frames captured.");
+        }
+
+        private void InitializeVlc(TimelapseRTSPOptions options) {
+            libVLC = new LibVLC("--no-audio", "--rtsp-tcp");
+
+            var url = options.RtspUrl;
+            var media = new Media(libVLC, new Uri(url));
+
+            if (!string.IsNullOrEmpty(options.RtspUsername)) {
+                media.AddOption($":rtsp-user={options.RtspUsername}");
+                media.AddOption($":rtsp-pwd={options.RtspPassword}");
+            }
+
+            media.AddOption(":network-caching=1000");
+            media.AddOption(":no-video-title-show");
+
+            mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.EnableHardwareDecoding = false;
+
+            mediaPlayer.Play();
+
+            Thread.Sleep(2000);
+        }
+
+        private void DisposeVlc() {
+            try {
+                if (mediaPlayer != null) {
+                    mediaPlayer.Stop();
+                    mediaPlayer.Dispose();
+                    mediaPlayer = null;
+                }
+
+                if (libVLC != null) {
+                    libVLC.Dispose();
+                    libVLC = null;
+                }
+            } catch (Exception ex) {
+                Logger.Warning($"TimelapseRTSP: Error disposing VLC: {ex.Message}");
+            }
         }
 
         private async Task CaptureLoop(CancellationToken token) {
@@ -51,7 +95,7 @@ namespace NINA.Plugin.TimelapseRTSP.Services {
 
             while (!token.IsCancellationRequested) {
                 try {
-                    await CaptureFrame(token);
+                    CaptureFrame(options);
                     await Task.Delay(interval, token);
                 } catch (OperationCanceledException) {
                     break;
@@ -62,88 +106,42 @@ namespace NINA.Plugin.TimelapseRTSP.Services {
             }
         }
 
-        private async Task CaptureFrame(CancellationToken token) {
-            var options = TimelapseRTSPOptions.Instance;
+        private void CaptureFrame(TimelapseRTSPOptions options) {
+            if (mediaPlayer == null || !mediaPlayer.IsPlaying) {
+                Logger.Warning("TimelapseRTSP: VLC media player not playing, skipping frame");
+                return;
+            }
+
             var outputPath = Path.Combine(tempDirectory, $"frame_{frameCount:D6}.jpg");
 
-            var rtspUrl = BuildRtspUrl(options);
+            var width = GetTargetWidth(options.FrameResolution);
+            var height = GetTargetHeight(options.FrameResolution);
 
-            var scaleFilter = BuildScaleFilter(options.FrameResolution);
-            var filterArgs = string.IsNullOrEmpty(scaleFilter) ? "" : $"-vf \"{scaleFilter}\" ";
-
-            var startInfo = new ProcessStartInfo {
-                FileName = options.FfmpegPath,
-                Arguments = $"-y -rtsp_transport tcp -rtsp_flags prefer_tcp -stimeout 10000000 -i \"{rtspUrl}\" -frames:v 1 {filterArgs}-q:v 2 \"{outputPath}\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-
-            using (var process = new Process { StartInfo = startInfo }) {
-                process.Start();
-
-                var completed = await WaitForProcessAsync(process, TimeSpan.FromSeconds(30), token);
-
-                if (!completed) {
-                    try { process.Kill(); } catch { }
-                    Logger.Warning("TimelapseRTSP: Frame capture timed out");
-                    return;
-                }
-
-                if (process.ExitCode != 0) {
-                    var error = await process.StandardError.ReadToEndAsync();
-                    Logger.Warning($"TimelapseRTSP: ffmpeg frame capture failed: {error}");
-                    return;
-                }
+            bool success;
+            if (width > 0 && height > 0) {
+                success = mediaPlayer.TakeSnapshot(0, outputPath, (uint)width, (uint)height);
+            } else {
+                success = mediaPlayer.TakeSnapshot(0, outputPath, 0, 0);
             }
 
-            if (File.Exists(outputPath)) {
+            if (success && File.Exists(outputPath)) {
                 Interlocked.Increment(ref frameCount);
                 Logger.Trace($"TimelapseRTSP: Captured frame {frameCount}");
+            } else {
+                Logger.Warning("TimelapseRTSP: Snapshot failed");
             }
         }
 
-        private static string BuildScaleFilter(string resolution) {
-            if (string.IsNullOrEmpty(resolution) || resolution == "Original") {
-                return null;
-            }
+        private static int GetTargetWidth(string resolution) {
+            if (string.IsNullOrEmpty(resolution) || resolution == "Original") return 0;
             var parts = resolution.Split('x');
-            if (parts.Length == 2) {
-                return $"scale={parts[0]}:{parts[1]}";
-            }
-            return null;
+            return parts.Length == 2 && int.TryParse(parts[0], out var w) ? w : 0;
         }
 
-        private static string BuildRtspUrl(TimelapseRTSPOptions options) {
-            var url = options.RtspUrl;
-            if (!string.IsNullOrEmpty(options.RtspUsername)) {
-                var uri = new Uri(url);
-                if (string.IsNullOrEmpty(uri.UserInfo)) {
-                    var user = Uri.EscapeDataString(options.RtspUsername);
-                    var pass = Uri.EscapeDataString(options.RtspPassword ?? "");
-                    var port = uri.Port > 0 ? uri.Port : 554;
-                    url = $"{uri.Scheme}://{user}:{pass}@{uri.Host}:{port}{uri.PathAndQuery}";
-                }
-            }
-            return url;
-        }
-
-        private static async Task<bool> WaitForProcessAsync(Process process, TimeSpan timeout, CancellationToken token) {
-            var tcs = new TaskCompletionSource<bool>();
-
-            process.EnableRaisingEvents = true;
-            process.Exited += (s, e) => tcs.TrySetResult(true);
-
-            if (process.HasExited) {
-                return true;
-            }
-
-            using (token.Register(() => tcs.TrySetCanceled())) {
-                var timeoutTask = Task.Delay(timeout, token);
-                var completedTask = await Task.WhenAny(tcs.Task, timeoutTask);
-                return completedTask == tcs.Task && tcs.Task.Result;
-            }
+        private static int GetTargetHeight(string resolution) {
+            if (string.IsNullOrEmpty(resolution) || resolution == "Original") return 0;
+            var parts = resolution.Split('x');
+            return parts.Length == 2 && int.TryParse(parts[1], out var h) ? h : 0;
         }
 
         public void Cleanup() {
