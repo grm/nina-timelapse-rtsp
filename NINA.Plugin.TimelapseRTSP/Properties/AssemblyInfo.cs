@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Timelapse RTSP")]
+[assembly: AssemblyTitle("TimelapseRTSP")]
 [assembly: AssemblyDescription("Creates timelapses from RTSP camera streams during imaging sessions")]
 [assembly: AssemblyCompany("Jeremie Klein")]
 [assembly: AssemblyProduct("NINA.Plugin.TimelapseRTSP")]
